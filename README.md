@@ -43,7 +43,7 @@ To setup the python environment for development, we need to install a few tools.
 ![K8S](./kubernetes_architecture_out.svg)
 
 ## LICENSE
-
+ 
 This project is open-sourced under the MIT License. Please read the [LICENSE](./LICENSE) for further details.
 
 ## Authors
