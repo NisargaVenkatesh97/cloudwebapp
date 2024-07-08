@@ -1,0 +1,68 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Unit Tests
+
+# Controls when the action will run.
+on:
+  workflow_dispatch:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  pull_request:
+    branches: [master]
+
+jobs:
+  unit_tests:
+    runs-on: ubuntu-latest
+    # container: node:latest
+    # strategy:
+    #   matrix:
+    #     node-version: [18.x]
+
+    environment: ${{ vars.ENVIRONMENT }}
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: ${{ vars.DATABASE }}
+          POSTGRES_USER: ${{ vars.DBUSER }}
+          POSTGRES_PASSWORD: ${{ secrets.DBPASSWORD }}
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    name: Run unit tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Create .env file"
+        run: |
+          touch .env
+          echo HOSTNAME=${{ vars.HOSTNAME }} >> .env
+          echo PORT=${{ vars.PORT }} >> .env
+          echo DATABASE=${{ vars.DATABASE }} >> .env
+          echo DBUSER=${{ vars.DBUSER }} >> .env
+          echo DBPASSWORD=${{ secrets.DBPASSWORD }} >> .env
+          echo DBHOST=${{ vars.DBHOST }} >> .env
+          echo DBPORT=${{ vars.DBPORT }} >> .env
+        # run: |
+        #   until nc -z localhost 5432; do
+        #     echo "Waiting for PostgreSQL to be up..."
+        #     sleep 5
+        #   done
+        # continue-on-error: true
+      # - name: Wait for PostgreSQL to be ready
+      # - name: Use Node.js ${{ matrix.node-version }}
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm run test
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
