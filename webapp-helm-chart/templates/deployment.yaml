@@ -1,0 +1,175 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-deployment
+  namespace: {{ .Values.namespace }}
+  labels: {{ include "webapp-helm-chart.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels: {{ include "webapp-helm-chart.labels" . | indent 6 }}
+  progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds }}
+  minReadySeconds: {{ .Values.minReadySeconds }}
+  strategy: {{ include "webapp-helm-chart.deployStrategy" . | indent 4 }}
+  template:
+    metadata:
+      labels: {{ include "webapp-helm-chart.labels" . | indent 8 }}
+    spec:
+      serviceAccountName: {{ .Release.Name }}-service-account
+      imagePullSecrets:
+        - name: {{ .Release.Name}}-robocop
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ .Values.podLabel.app }}
+              - key: service
+                operator: In
+                values:
+                - {{ .Values.podLabel.service }}
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            requests:
+              memory: {{ .Values.resources.requests.memory}}
+              cpu: {{ .Values.resources.requests.cpu}}
+            limits:
+              memory: {{ .Values.resources.limits.memory}}
+              cpu: {{ .Values.resources.limits.cpu}}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe: {{ include "webapp-helm-chart.livenessProbe" . | indent 10 }}
+          readinessProbe: {{ include "webapp-helm-chart.readinessProbe" . | indent 10 }}
+          env:
+            - name: HOSTNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: app_hostname
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: app_port
+            - name: DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: app_db
+            - name: DBUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: flyway_user
+            - name: DBPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: flyway_password
+            - name: DBHOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: app_dbhost
+            - name: DBPORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: app_dbport
+            - name: DBSCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: app_dbschema
+            - name: K8S_GROUP
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: k8s_group
+            - name: K8S_API_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: k8s_api_version
+            - name: K8S_CR_KIND
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: k8s_cr_kind
+            - name: K8S_CR_KIND_PLURAL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: k8s_cr_kind_plural
+            - name: K8S_NAMESPACE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: k8s_namespace
+            - name: K8S_BROKER_0
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: k8s_broker_0
+            - name: K8S_BROKER_1
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: k8s_broker_1
+            - name: K8S_BROKER_2
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: k8s_broker_2
+            - name: K8S_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: k8s_client_id
+            - name: K8S_DOCKER_CONFIG_JSON
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: k8s_docker_config_json
+            - name: K8S_TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: k8s_topic
+      initContainers:
+        - name: db-migration
+          image: "{{ .Values.initContainer.repository }}/{{ .Values.initContainer.name }}:{{ .Values.initContainer.tag }}"
+          imagePullPolicy: {{ .Values.initContainer.pullPolicy }}
+          # set environment variables for flyway db migration
+          env:
+            - name: FLYWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: flyway_url
+            - name: FLYWAY_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: flyway_user
+            - name: FLYWAY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: flyway_password
+            - name: DBSCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: app_dbschema
+          command: ["flyway", "migrate"]
