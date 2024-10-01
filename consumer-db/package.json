@@ -1,0 +1,32 @@
+{
+  "name": "consumer-db",
+  "version": "1.0.1",
+  "description": "Consumer database migration using Flyway",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/csye7125-fall2023-group05/consumer-db.git"
+  },
+  "keywords": [
+    "flyway",
+    "database",
+    "migration"
+  ],
+  "author": "Siddharth Rawat <rawat.sid@northeastern.edu>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/csye7125-fall2023-group05/consumer-db/issues"
+  },
+  "homepage": "https://github.com/csye7125-fall2023-group05/consumer-db#readme",
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^11.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^9.2.3",
+    "@semantic-release/npm": "^11.0.1",
+    "@semantic-release/release-notes-generator": "^12.1.0"
+  }
+}
