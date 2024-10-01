@@ -45,11 +45,3 @@ To setup the python environment for development, we need to install a few tools.
 ## LICENSE
 
 This project is open-sourced under the MIT License. Please read the [LICENSE](./LICENSE) for further details.
-
-## Authors
-
-[Siddharth Rawat](https://github.com/sydrawat01)
-
-[Rishab Agarwal](https://github.com/rishabNeu)
-
-[Karan Wadhwa](https://github.com/karanwadhwa)
