@@ -1,0 +1,10 @@
+timeout                     = 600
+infra_values_file           = "./vars/infra_values.yaml"
+webapp_values_file          = "./vars/webapp_values.yaml"
+kube_prometheus_values_file = "./vars/kube_prometheus_values.yaml"
+elasticsearch_values_file   = "./vars/elasticsearch_values.yaml"
+kibana_values_file          = "./vars/kibana_values.yaml"
+fluentbit_values_file       = "./vars/fluentbit_values.yaml"
+chart_path                  = "../modules/charts"
+webapp_chart                = "webapp-helm-chart-1.8.3.tar.gz"
+infra_chart                 = "infra-helm-chart-1.10.0.tar.gz"
