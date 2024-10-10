@@ -1,6 +1,0 @@
-# https://docs.docker.com/build/building/context/#dockerignore-files/
-.env
-node_modules/
-*.log
-logs/
-k8s/
