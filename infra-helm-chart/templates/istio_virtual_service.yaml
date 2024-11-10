@@ -1,0 +1,32 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ .Release.Name }}-vs
+  namespace: {{ .Values.istio.namespace }}
+spec:
+  hosts:
+  - {{ .Release.Name }}-kafka-broker-0.{{ .Release.Name }}-kafka-broker-headless.{{ .Values.namespace }}.svc.cluster.local
+  - {{ .Release.Name }}-kafka-broker-1.{{ .Release.Name }}-kafka-broker-headless.{{ .Values.namespace }}.svc.cluster.local
+  - {{ .Release.Name }}-kafka-broker-2.{{ .Release.Name }}-kafka-broker-headless.{{ .Values.namespace }}.svc.cluster.local
+  tcp:
+  - match:
+    - port: {{ .Values.configs.kafka_port}}  # to match the gateway port basically to bind this to gateway
+    route:
+    - destination:
+        host: {{ .Release.Name }}-kafka-broker-0.{{ .Release.Name }}-kafka-broker-headless.{{ .Values.namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.configs.kafka_port}}
+  - match:
+    - port: {{ .Values.configs.kafka_port}}  # to match the gateway port basically to bind this to gateway
+    route:
+    - destination:
+        host: {{ .Release.Name }}-kafka-broker-1.{{ .Release.Name }}-kafka-broker-headless.{{ .Values.namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.configs.kafka_port}}
+  - match:
+    - port: {{ .Values.configs.kafka_port}}  # to match the gateway port basically to bind this to gateway
+    route:
+    - destination:
+        host: {{ .Release.Name }}-kafka-broker-2.{{ .Release.Name }}-kafka-broker-headless.{{ .Values.namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.configs.kafka_port}}

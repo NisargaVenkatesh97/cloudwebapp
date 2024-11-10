@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "infra-helm-chart.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels: {{ include "infra-helm-chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels: {{ include "infra-helm-chart.labels" . | nindent 6 }}
+  progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds }}
+  minReadySeconds: {{ .Values.minReadySeconds }}
+  strategy: {{ include "infra-helm-chart.deployStrategy" . | indent 4 }}
+  template:
+    metadata:
+      labels: {{ include "infra-helm-chart.labels" . | nindent 8 }}
+    spec:
+      initContainers:
+        - name: {{ .Chart.Name }}-init
+          image: "{{ .Values.initContainer.repository }}/{{ .Values.initContainer.name }}:{{ .Values.initContainer.tag }}"
+          imagePullPolicy: {{ .Values.initContainer.pullPolicy }}
+          # set environment variables for flyway db migration
+          env:
+            - name: FLYWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: flyway_url
+            - name: FLYWAY_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: username
+            - name: FLYWAY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: password
+            - name: DBSCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: app_dbschema
+          command: ["flyway", "migrate"]
+      imagePullSecrets:
+        - name: {{ .Release.Name }}-robocop
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ .Values.podLabel.app }}
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: {{ .Chart.Name }}-consumer
+          image: "{{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            requests:
+              memory: {{ .Values.resources.requests.memory}}
+              cpu: {{ .Values.resources.requests.cpu}}
+            limits:
+              memory: {{ .Values.resources.limits.memory}}
+              cpu: {{ .Values.resources.limits.cpu}}
+          env:
+            - name: BROKER_0
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: broker_0
+            - name: BROKER_1
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: broker_1
+            - name: BROKER_2
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: broker_2
+            - name: CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: client_id
+            - name: TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: topic
+            - name: USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: username
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: password
+            - name: DBHOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: dbhost
+            - name: DBPORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: dbport
+            - name: DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-configmap
+                  key: db

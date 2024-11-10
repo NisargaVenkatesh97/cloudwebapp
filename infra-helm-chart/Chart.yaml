@@ -1,0 +1,26 @@
+apiVersion: v2
+name: infra-helm-chart
+description: A Helm chart for Kubernetes to install dependencies
+type: application
+version: 1.10.0
+appVersion: 1.16.0
+home: https://github.com/csye7125-fall2023-group05/infra-helm-chart
+keywords:
+  - CSYE-7125 Infrastructure HELM Chart
+  - dependency helm chart
+maintainers:
+  - name: Siddharth Rawat
+    email: rawat.sid@northeastern.edu
+    url: https://sydrawat.live
+  - name: Rishab Rajesh Agarwal
+    email: agarwal.risha@northeastern.edu
+  - name: Karan Wadhwa
+    email: wadhwa.k@northeastern.edu
+dependencies:
+  - name: kafka
+    version: 26.4.x
+    repository: https://charts.bitnami.com/bitnami
+  - name: postgresql
+    version: 13.1.5
+    repository: https://charts.bitnami.com/bitnami
+    condition: psql.enabled
