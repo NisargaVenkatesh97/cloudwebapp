@@ -1,0 +1,35 @@
+{
+  "name": "kafka-producer",
+  "version": "1.0.6",
+  "description": "Kafka producer app",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start:dev": "nodemon --experimental-modules index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Siddharth Rawat <rawat.sid@northeastern.edu>, Rishab Agarwal <agarwal.risha@northeastern.edu>, Karan Wadhwa <wadhwa.k@northeastern.edu>",
+  "license": "MIT",
+  "private": "true",
+  "dependencies": {
+    "app-root-path": "^3.1.0",
+    "dotenv": "^16.3.1",
+    "kafkajs": "^2.2.4",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^11.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^9.2.3",
+    "@semantic-release/npm": "^11.0.1",
+    "@semantic-release/release-notes-generator": "^12.1.0",
+    "eslint": "^8.53.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.3"
+  }
+}

@@ -1,0 +1,121 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.13.0
+  name: crons.webappcron.csye7125-fall2023-group05.cloud
+spec:
+  group: webappcron.csye7125-fall2023-group05.cloud
+  names:
+    kind: Cron
+    listKind: CronList
+    plural: crons
+    singular: cron
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: Cron is the Schema for the crons API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: CronSpec defines the desired state of Cron
+            properties:
+              broker_0:
+                description: Optional Kafka Broker 0 ID:PORT
+                minLength: 0
+                type: string
+              broker_1:
+                description: Optional Kafka Broker 1 ID:PORT
+                minLength: 0
+                type: string
+              broker_2:
+                description: Optional Kafka Broker 2 ID:PORT
+                minLength: 0
+                type: string
+              client_id:
+                description: Optional Kafka Client ID
+                minLength: 0
+                type: string
+              dockerConfigJSON:
+                description: Optional Base64 encoded Quay.io robot credentials to
+                  pull private docker images
+                type: string
+              failure_limit:
+                default: 0
+                description: The failed jobs history limit
+                format: int32
+                type: integer
+              http_check_id:
+                description: The UUID of the message consumed from the producer
+                minLength: 0
+                type: string
+              name:
+                description: The name of the application to monitor for healthcheck
+                minLength: 0
+                type: string
+              res_code:
+                description: Optional healthcheck data response code
+                minimum: 0
+                type: integer
+              retries:
+                default: 5
+                description: The number of retries to publish healthcheck data
+                format: int32
+                maximum: 5
+                minimum: 1
+                type: integer
+              schedule:
+                description: The schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
+                minLength: 0
+                type: string
+              success_limit:
+                default: 0
+                description: The successful jobs history limit
+                format: int32
+                type: integer
+              topic:
+                description: Optional Kafka Topic to connect the producer to the broker
+                  and publish the healthcheck message
+                minLength: 0
+                type: string
+              url:
+                description: URL to GET healthcheck data for
+                minLength: 0
+                type: string
+            required:
+            - http_check_id
+            - retries
+            - schedule
+            - url
+            type: object
+          status:
+            description: CronStatus defines the observed state of Cron
+            properties:
+              active:
+                default: false
+                description: Status of the CronJob
+                type: boolean
+              lastScheduleTime:
+                description: Information when was the last time the job was successful.
+                format: date-time
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

@@ -1,0 +1,25 @@
+apiVersion: webappcron.csye7125-fall2023-group05.cloud/v1
+kind: Cron
+metadata:
+  labels:
+    app.kubernetes.io/name: cron
+    app.kubernetes.io/instance: cron-sample
+    app.kubernetes.io/part-of: k8s-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: k8s-operator
+  name: kw-golang-expert
+spec:
+  schedule: "* * * * *"
+  name: "google"
+  url: "https://google.com"
+  retries: 5
+  res_code: 200
+  http_check_id: "aa9f3201-9b51-41fe-93ab-a22f3deb75e4"
+  broker_0: "infra-helm-release-kafka-broker-0.infra-helm-release-kafka-broker-headless.deps.svc.cluster.local:9094"
+  broker_1: "infra-helm-release-kafka-broker-1.infra-helm-release-kafka-broker-headless.deps.svc.cluster.local:9094"
+  broker_2: "infra-helm-release-kafka-broker-2.infra-helm-release-kafka-broker-headless.deps.svc.cluster.local:9094"
+  client_id: "webapp"
+  topic: "healthcheck"
+  failure_limit: 0
+  success_limit: 0
+  dockerConfigJSON: b2theS1tci1oYWNrZXItY2FsbS1kb3duCg==
