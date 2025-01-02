@@ -1,51 +1,149 @@
 # Architecture
 
-To create version controlled infrastructure architecture diagrams, and have proper audit trails, we make use of a new concept called `Diagram as Code` or `DaC`.
+🏗️ Infrastructure Stack Deployment - Project README
 
-This is still a work in progress, for implementation details, visit [Diagrams](https://diagrams.mingrammer.com/), which lets us create diagrams programmatically using Python.
+Comprehensive guide to deploying a robust CI/CD, Kubernetes, and monitoring ecosystem using Terraform, Helm, Jenkins, ArgoCD, Kafka, Flyway, and more.
 
-## Setup
+📌 Overview
 
-The only pre-requisite is you need to have python installed on your workstation.
-To setup the python environment for development, we need to install a few tools. Let's set them up:
+This project automates the deployment of a production-grade infrastructure stack using Infrastructure as Code (IaC). It includes Jenkins CI/CD pipelines, EKS (Elastic Kubernetes Service) via Terraform, monitoring and logging via Prometheus, Grafana, EFK, and seamless database migrations via Flyway.
 
-- Install [Poetry](https://python-poetry.org/):
+🗺️ Architecture Diagram
 
-  ```shell
-  # This is only for MacOS users, for other distros, refer the documentation
-  brew install poetry
-  ```
+Diagrams are generated using Diagrams as Code with Python and Poetry:
 
-- Run `init` to initialize the project, similar to `npm init` as in the case of `npm`:
+architecture diagram image (kubernetes_architecture_out.svg) 
 
-  ```shell
-  # This command will guide you through creating your `pyproject.toml` config.
-  poetry init
-  ```
 
-- Add the [Diagrams](https://diagrams.mingrammer.com/docs/getting-started/installation) library to the poetry `pyproject.toml` file:
+🚀 Infrastructure Components
 
-  ```shell
-  # This command will create a virtualenv at $HOME/Library/Caches/pypoetry/virtualenvs/
-  poetry add diagrams
-  ```
+🔧 Terraform IaC
 
-- To view the python environment path and executable location for your python project's virtualenv, use the `env info` command:
+Used to provision Jenkins, EKS cluster, backend S3 storage, and networking components.
 
-  ```shell
-  poetry env info
-  ```
+Backend stores .tfstate in S3 and uses DynamoDB for locking.
 
-- To run the python file with the DaC definition, we need to set the python interpreter path in `VSCode`. Use `cmd` + `shift` + `p` to open up the command palette, and then type: `Python: Select Interpreter` -> click on `Enter interpreter path...` and then copy and paste the virtualenv executable path here by running the command in the previous step, i.e, `poetry env info`. This will help setup the default interpreter to use the exact virtualenv for your specified project.
+Terraform commands:
 
-## Architecture Diagram
+terraform init
+terraform validate
+terraform plan -var-file="prod.tfvars"
+terraform apply --auto-approve -var-file="prod.tfvars"
 
-![K8S](./kubernetes_architecture_out.svg)
+📦 Helm & Terraform Helm Provider
 
-## LICENSE
- 
-This project is open-sourced under the MIT License. Please read the [LICENSE](./LICENSE) for further details.
+Used to install charts like Kafka, PostgreSQL, Istio, kube-prometheus-stack.
 
-## Authors
+Helm installed via Terraform with config_path = "~/.kube/config".
+
+
+
+🐳 Kubernetes Stack
+
+✅ AWS EKS
+
+Managed Kubernetes deployed using Terraform.
+
+Access cluster:
+WS_PROFILE=<your-profile>
+export REGION=us-east-1
+export CLUSTER_NAME=<your-cluster-name>
+aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
+
+🔄 ArgoCD
+
+GitOps deployment using ArgoCD.
+tent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl port-forward svc/argocd-server 8080:443 -n argocd
+
+
+📥 Database Migrations - Flyway + PostgreSQL
+
+Uses Flyway to run .sql migration scripts.
+
+Flyway configured with secrets via Kubernetes.
+
+Migrations run inside initContainer:
+
+flyway migrate
+
+Supports containerized Flyway migrations.
+
+
+🛠️ Jenkins CI/CD Setup
+
+AMI built with Jenkins pre-installed via Packer.
+
+Jenkins setup automated using Configuration-as-Code (JCasC).
+
+Plugins installed using Jenkins plugin manager.
+
+Reverse proxy configured via Caddy.
+
+Supports multi-branch pipelines using Groovy DSL.
+
+
+🔁 Kafka Stack
+
+Kafka cluster deployed using Bitnami's Helm chart.
+
+Kafka consumer app subscribes to topic and processes messages.
+
+Kafka setup includes 3 broker replicas and Zookeeper.
+
+
+
+🔍 Monitoring & Logging
+
+📊 Prometheus + Grafana
+
+Installed via kube-prometheus-stack Helm chart.
+
+Dashboards for CPU, memory, and pod usage.
+
+📈 Logging - EFK Stack
+
+ElasticSearch, Fluentbit, and Kibana setup via Helm.
+
+Secrets for ElasticSearch and Kibana fetched via Kubernetes secrets.
+
+Dashboards accessible at respective LoadBalancer IPs.
+
+
+
+🤖 Kubernetes Operator (Kubebuilder)
+
+Custom CRD and Reconciler logic built using Kubebuilder.
+
+Cron resource triggers ConfigMap and Secret updates.
+
+Key commands:
+make install
+make deploy IMG=<image>
+kubectl apply -k config/samples/
+
+
+
+📦 Local Dev Environment Setup
+
+Python + DaC
+
+Python environment setup using Poetry.
+brew install poetry
+poetry init
+poetry add diagrams
+
+PostgreSQL + Flyway
+brew install postgresql@15
+brew install flyway
+
+Jenkins + Java +Python+ NodeJS + Docker
+
+Java: sudo apt install openjdk-11-jdk
+
+Node: curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+
+Docker: sudo apt-get install docker-ce
+
 
 
