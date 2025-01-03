@@ -12,7 +12,10 @@ This project automates the deployment of a production-grade infrastructure stack
 
 Diagrams are generated using Diagrams as Code with Python and Poetry:
 
-architecture diagram image (kubernetes_architecture_out.svg) 
+architecture diagram image
+<a href="https://ibb.co/qMbvKTps">
+  <img src="https://i.ibb.co/nshF9xjc/kubernetes-architecture.png" alt="kubernetes-architecture" border="0" />
+</a>
 
 
 🚀 Infrastructure Components
