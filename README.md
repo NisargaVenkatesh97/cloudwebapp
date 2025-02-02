@@ -2,15 +2,15 @@
 
 🏗️ Infrastructure Stack Deployment - Project README
 
-Comprehensive guide to deploying a robust CI/CD, Kubernetes, and monitoring ecosystem using Terraform, Helm, Jenkins, ArgoCD, Kafka, Flyway, and more.
+  Comprehensive guide to deploying a robust CI/CD, Kubernetes, and monitoring ecosystem using Terraform, Helm, Jenkins, ArgoCD, Kafka, Flyway, and more.
 
 📌 Overview
 
-This project automates the deployment of a production-grade infrastructure stack using Infrastructure as Code (IaC). It includes Jenkins CI/CD pipelines, EKS (Elastic Kubernetes Service) via Terraform, monitoring and logging via Prometheus, Grafana, EFK, and seamless database migrations via Flyway.
+  This project automates the deployment of a production-grade infrastructure stack using Infrastructure as Code (IaC). It includes Jenkins CI/CD pipelines, EKS (Elastic Kubernetes Service) via Terraform, monitoring and logging via Prometheus, Grafana, EFK, and seamless database migrations via Flyway.
 
 🗺️ Architecture Diagram
 
-Diagrams are generated using Diagrams as Code with Python and Poetry:
+  Diagrams are generated using Diagrams as Code with Python and Poetry:
 
 architecture diagram image
 <a href="https://ibb.co/qMbvKTps">
@@ -18,135 +18,135 @@ architecture diagram image
 </a>
 
 
-🚀 Infrastructure Components
+# Infrastructure Components
 
-🔧 Terraform IaC
+  🔧 Terraform IaC
 
-Used to provision Jenkins, EKS cluster, backend S3 storage, and networking components.
+  Used to provision Jenkins, EKS cluster, backend S3 storage, and networking components.
 
-Backend stores .tfstate in S3 and uses DynamoDB for locking.
+  Backend stores .tfstate in S3 and uses DynamoDB for locking.
 
-Terraform commands:
+  Terraform commands:
 
-terraform init
-terraform validate
-terraform plan -var-file="prod.tfvars"
-terraform apply --auto-approve -var-file="prod.tfvars"
+  terraform init
+  terraform validate
+  terraform plan -var-file="prod.tfvars"
+  terraform apply --auto-approve -var-file="prod.tfvars"
 
-📦 Helm & Terraform Helm Provider
+  📦 Helm & Terraform Helm Provider
 
-Used to install charts like Kafka, PostgreSQL, Istio, kube-prometheus-stack.
+  Used to install charts like Kafka, PostgreSQL, Istio, kube-prometheus-stack.
 
-Helm installed via Terraform with config_path = "~/.kube/config".
+  Helm installed via Terraform with config_path = "~/.kube/config".
 
 
 
-🐳 Kubernetes Stack
+#🐳 Kubernetes Stack
 
 ✅ AWS EKS
 
-Managed Kubernetes deployed using Terraform.
+    Managed Kubernetes deployed using Terraform.
 
-Access cluster:
-WS_PROFILE=<your-profile>
-export REGION=us-east-1
-export CLUSTER_NAME=<your-cluster-name>
-aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
+    Access cluster:
+    WS_PROFILE=<your-profile>
+    export REGION=us-east-1
+    export CLUSTER_NAME=<your-cluster-name>
+    aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
 
-🔄 ArgoCD
+#🔄 ArgoCD
 
-GitOps deployment using ArgoCD.
-tent.com/argoproj/argo-cd/stable/manifests/install.yaml
-kubectl port-forward svc/argocd-server 8080:443 -n argocd
-
-
-📥 Database Migrations - Flyway + PostgreSQL
-
-Uses Flyway to run .sql migration scripts.
-
-Flyway configured with secrets via Kubernetes.
-
-Migrations run inside initContainer:
-
-flyway migrate
-
-Supports containerized Flyway migrations.
+    GitOps deployment using ArgoCD.
+    tent.com/argoproj/argo-cd/stable/manifests/install.yaml
+    kubectl port-forward svc/argocd-server 8080:443 -n argocd
 
 
-🛠️ Jenkins CI/CD Setup
+#📥 Database Migrations - Flyway + PostgreSQL
 
-AMI built with Jenkins pre-installed via Packer.
+    Uses Flyway to run .sql migration scripts.
 
-Jenkins setup automated using Configuration-as-Code (JCasC).
+    Flyway configured with secrets via Kubernetes.
 
-Plugins installed using Jenkins plugin manager.
+    Migrations run inside initContainer:
 
-Reverse proxy configured via Caddy.
+    flyway migrate
 
-Supports multi-branch pipelines using Groovy DSL.
-
-
-🔁 Kafka Stack
-
-Kafka cluster deployed using Bitnami's Helm chart.
-
-Kafka consumer app subscribes to topic and processes messages.
-
-Kafka setup includes 3 broker replicas and Zookeeper.
+    Supports containerized Flyway migrations.
 
 
+#🛠️ Jenkins CI/CD Setup
 
-🔍 Monitoring & Logging
+    AMI built with Jenkins pre-installed via Packer.
 
-📊 Prometheus + Grafana
+    Jenkins setup automated using Configuration-as-Code (JCasC).
 
-Installed via kube-prometheus-stack Helm chart.
+    Plugins installed using Jenkins plugin manager.
 
-Dashboards for CPU, memory, and pod usage.
+    Reverse proxy configured via Caddy.
 
-📈 Logging - EFK Stack
+    Supports multi-branch pipelines using Groovy DSL.
 
-ElasticSearch, Fluentbit, and Kibana setup via Helm.
 
-Secrets for ElasticSearch and Kibana fetched via Kubernetes secrets.
+#🔁 Kafka Stack
 
-Dashboards accessible at respective LoadBalancer IPs.
+    Kafka cluster deployed using Bitnami's Helm chart.
+
+    Kafka consumer app subscribes to topic and processes messages.
+
+    Kafka setup includes 3 broker replicas and Zookeeper.
 
 
 
-🤖 Kubernetes Operator (Kubebuilder)
+#🔍 Monitoring & Logging
 
-Custom CRD and Reconciler logic built using Kubebuilder.
+    📊 Prometheus + Grafana
 
-Cron resource triggers ConfigMap and Secret updates.
+    Installed via kube-prometheus-stack Helm chart.
 
-Key commands:
-make install
-make deploy IMG=<image>
-kubectl apply -k config/samples/
+    Dashboards for CPU, memory, and pod usage.
+
+    📈 Logging - EFK Stack
+
+    ElasticSearch, Fluentbit, and Kibana setup via Helm.
+
+    Secrets for ElasticSearch and Kibana fetched via Kubernetes secrets.
+
+    Dashboards accessible at respective LoadBalancer IPs.
 
 
 
-📦 Local Dev Environment Setup
+# 🤖 Kubernetes Operator (Kubebuilder)
 
-Python + DaC
+    Custom CRD and Reconciler logic built using Kubebuilder.
 
-Python environment setup using Poetry.
-brew install poetry
-poetry init
-poetry add diagrams
+    Cron resource triggers ConfigMap and Secret updates.
 
-PostgreSQL + Flyway
-brew install postgresql@15
-brew install flyway
+    Key commands:
+    make install
+    make deploy IMG=<image>
+    kubectl apply -k config/samples/
 
-Jenkins + Java +Python+ NodeJS + Docker
 
-Java: sudo apt install openjdk-11-jdk
 
-Node: curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+#📦 Local Dev Environment Setup
 
-Docker: sudo apt-get install docker-ce
+    Python + DaC
+
+    Python environment setup using Poetry.
+    brew install poetry
+    poetry init
+    poetry add diagrams
+
+    PostgreSQL + Flyway
+    brew install postgresql@15
+    brew install flyway
+
+    Jenkins + Java +Python+ NodeJS + Docker
+
+    Java: sudo apt install openjdk-11-jdk
+
+    Node: curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+
+    Docker: sudo apt-get install docker-ce
 
 
 
